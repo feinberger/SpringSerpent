@@ -1,0 +1,9 @@
+venv
+.vscode
+src/SpringSerpent/__pycache__/
+src/SpringSerpent/ui/__pycache__/
+.idea
+database/jobs.db
+src/Teknic/build/
+src/SpringSerpent/certs/
+src/SpringSerpent/aws_configuration.json

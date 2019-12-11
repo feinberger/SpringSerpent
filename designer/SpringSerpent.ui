@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1360</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="central_widget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QStackedWidget" name="screen_stack">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <widget class="HomeScreen" name="home_screen"/>
+      <widget class="NewJobScreen" name="new_job_screen"/>
+      <widget class="MachineScreen" name="machine_screen"/>
+      <widget class="JobLibraryScreen" name="job_library_screen"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HomeScreen</class>
+   <extends>QWidget</extends>
+   <header>SpringSerpent.HomeScreen</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NewJobScreen</class>
+   <extends>QWidget</extends>
+   <header>SpringSerpent.NewJobScreen</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MachineScreen</class>
+   <extends>QWidget</extends>
+   <header>SpringSerpent.MachineScreen</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JobLibraryScreen</class>
+   <extends>QWidget</extends>
+   <header>SpringSerpent.JobLibraryScreen</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

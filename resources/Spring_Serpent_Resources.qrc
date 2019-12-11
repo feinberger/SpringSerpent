@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="buttons">
+    <file>buttons/home_button.png</file>
+    <file>buttons/back_button.png</file>
+    <file>buttons/information.png</file>
+    <file>buttons/proceed_button.png</file>
+    <file>buttons/settings.png</file>
+    <file>buttons/new_job.png</file>
+    <file>buttons/warning.png</file>
+    <file>buttons/machine.png</file>
+    <file>buttons/job_library.png</file>
+  </qresource>
+</RCC>
