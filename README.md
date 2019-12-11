@@ -19,7 +19,7 @@ $ python3 -m pip install -r requirements.txt
 ```sh
 $ make PLATFORM=RPI
 ```
-5. Navigate to local folder and run application. This starts both servers and the on-board GUI.
+5. Navigate to local folder and run application. This starts the main controller and interface, but won't load until motor controller is online.
 ```sh
 $ python3 main.py
 ```
