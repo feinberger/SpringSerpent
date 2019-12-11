@@ -4,7 +4,7 @@ This is a prototype development project for an automated spring winder developed
 ## Notes and Installation
 1. Get source code:
 ```sh
-$ git clone https://github.com/feinberger/Temp-o-Matic-Hub-v2.git
+$ git clone https://github.com/feinberger/SpringSerpent.git
 ```
 2. Install pyqt requirements
 ```sh
