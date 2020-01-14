@@ -23,8 +23,6 @@ int main(int argc, char const *argv[])
 
     // Initialize z-axis motor
     INode &zaxisMotor = openMotor(teknicManager, motorController, ZAXIS_MOTOR);
-    double position = zaxisMotor.Motion.PosnMeasured.Value();
-    std::cout << std::to_string(position);
 
     //  Prepare context and socket
     zmq::context_t context (1);
@@ -54,8 +52,6 @@ int main(int argc, char const *argv[])
 
         // Parse message
         determineCommand(receivedMsg, zaxisMotor);
-        double position = zaxisMotor.Motion.PosnMeasured.Value();
-        std::cout << std::to_string(position);
 
     }
     statusThread.join(); 

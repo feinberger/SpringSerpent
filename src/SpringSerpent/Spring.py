@@ -97,7 +97,9 @@ def create_spring_instructions(start_dead_turns, end_dead_turns, live_turns, liv
         wire_diameter (str): Wire diameter used in spring job
     """
     # Instruction List (to be converted to json)
-    instruction_set = []
+    instruction_set = {}
+    instruction_list = []
+    move_total = 0
 
     # Initial distance required starts at 0
     total_distance = 0
@@ -105,14 +107,48 @@ def create_spring_instructions(start_dead_turns, end_dead_turns, live_turns, liv
     # Move Count starts at 0
     move_count = 0
 
-    # single instruction place-holder
-    instruction = {}
+    print("Instructions")
+    print(f"Start Turns: {start_dead_turns}")
+    print(f"End Turns: {end_dead_turns}")
+    print(f"Live Turns: {live_turns}")
+    print(f"Live Turn Spacing: {live_turns_spacing}")
+    print(f"Live Turn Spacing: {wire_diameter}") 
+
+    print("Adding Start Dead Turns")
 
     # Add start dead turn moves
-    for i in range(int(start_dead_turns)):
+    for s in range(int(start_dead_turns)):
+        instruction = {}
         instruction["Command"] = "Move Z"
-        instruction["Position"] = convert_in_to_counts(float(wire_diameter))
-        instruction_set.append(instruction)
+        distance = float(wire_diameter)
+        instruction["Position"] = convert_in_to_counts(distance)
+        move_total += instruction["Position"]
+        instruction_list.append(instruction)
+    
+    print("Adding Live Turns")
+
+    # Add live turn moves
+    for l in range(int(live_turns)):
+        instruction = {}
+        instruction["Command"] = "Move Z"
+        distance = float(live_turns_spacing) + float(wire_diameter)
+        instruction["Position"] = convert_in_to_counts(distance)
+        move_total += instruction["Position"]
+        instruction_list.append(instruction)
+
+    print("Adding End Dead Turns")
+    # Add end dead turn moves
+    for e in range(int(end_dead_turns)):
+        instruction = {}
+        instruction["Command"] = "Move Z"
+        distance = float(wire_diameter)
+        instruction["Position"] = convert_in_to_counts(distance)
+        move_total += instruction["Position"]
+        instruction_list.append(instruction)
+
+    # Add move total and instruction list to instruction set
+    instruction_set["Move Total"] = move_total
+    instruction_set["Instructions"] = instruction_list
 
     return instruction_set
 
@@ -120,7 +156,7 @@ def convert_in_to_counts(distance):
     """ Function to convert inches into an encoder count for moves """
     # 6400 counts per revolution
     # 1 rev = .1 in of z-axis travel
-    count_total = (6400 * distance) / (.1)
+    count_total = (6400.0 * float(distance)) / (.1)
 
     # round count total to nearest whole number
     return int(round(count_total))
@@ -145,8 +181,6 @@ class MotorThread(QThread):
         """
         # Run through all instructions
         for instruction in self.instruction_set:
-            print(instruction)
-
             # Create payload for message
             payload = {}
             payload["Command"] = instruction["Command"]
@@ -155,6 +189,8 @@ class MotorThread(QThread):
             # Create message to send over socket
             message = {}
             message['Payload'] = payload
+
+            # print("instruction:", message)
 
             # Send json message over socket
             self.motor_client.send_json(message)
@@ -172,6 +208,7 @@ class MotorStatusThread(QThread):
     signal = pyqtSignal(str)
     new_pos = pyqtSignal(str)
     new_rpm = pyqtSignal(str)
+    new_status = pyqtSignal(str)
 
     def __init__(self):
         """ init function of Motor Thread """
@@ -187,13 +224,19 @@ class MotorStatusThread(QThread):
         while True:
             # Wait for message
             msg = self.motor_subscription.recv()
-            item = json.loads(msg.decode("utf-8"))
-            rpm = float(item["Z RPM"])
-            rpm = f"{rpm:.0f}"
-            pos = float(item["Z Position"])
-            pos = f"{pos:.0f}"
-            self.new_rpm.emit(rpm)
-            self.new_pos.emit(pos)
+            try:
+                item = json.loads(msg.decode("utf-8"))
+            except Exception as e:
+                print(e)
+            else:
+                rpm = float(item["Z RPM"])
+                rpm = f"{rpm:.0f}"
+                pos = float(item["Z Position"])
+                pos = f"{pos:.0f}"
+                status = item["Z Status"]
+                self.new_rpm.emit(rpm)
+                self.new_pos.emit(pos)
+                self.new_status.emit(status)
 
         # Emit done signal
         self.signal.emit('Done')

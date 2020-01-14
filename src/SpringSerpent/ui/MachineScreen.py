@@ -28,8 +28,8 @@ class Ui_MachineScreen(object):
         self.Header.setStyleSheet("QFrame {\n"
 "    background-color: rgba(235, 152, 78, 1);\n"
 "}")
-        self.Header.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.Header.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.Header.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.Header.setFrameShadow(QtWidgets.QFrame.Plain)
         self.Header.setObjectName("Header")
         self.no_job_header = QtWidgets.QWidget()
         self.no_job_header.setStyleSheet("QWidget {\n"

@@ -48,11 +48,21 @@ class JobLibraryScreen(QWidget):
         # Connect selection
         self.screen_ui.job_library_table.itemSelectionChanged.connect(self.show_hidden_buttons)
 
+        # Connect filter functions
+        self.screen_ui.company_name.textChanged.connect(self.filter_table_function)
+        self.screen_ui.part_number.textChanged.connect(self.filter_table_function)
+        self.screen_ui.compression_spring.stateChanged.connect(self.filter_table_function)
+        self.screen_ui.extension_spring.stateChanged.connect(self.filter_table_function)
+
         # Connect barcode slot
         self.screen_ui.barcode_edit.returnPressed.connect(self.process_barcode)
 
         # Update job library table
         self.update_jobs()
+
+        # Set Filter Compression and Extension to checked
+        self.screen_ui.compression_spring.setChecked(True)
+        self.screen_ui.extension_spring.setChecked(True)
 
     def prepare_screen(self):
         """ Prepares screen for use """
@@ -121,29 +131,50 @@ class JobLibraryScreen(QWidget):
 
     def scan_barcode(self):
         ''' function to handle barcode job loading'''
+        # Clear text
+        self.screen_ui.barcode_edit.clear()
+
+        # Set focus to allow for text input
         self.screen_ui.barcode_edit.setFocus()
     
     def process_barcode(self):
         ''' function to process the selected barcode '''
         # Parse barcode data (partnumber-companyname)
         barcode_text = self.screen_ui.barcode_edit.text()
-        barcode_part_number = barcode_text.split('-')[0]
-        barcode_company_name = barcode_text.split('-')[1]
 
-        # Get number of rows from table
-        table_rows = self.screen_ui.job_library_table.rowCount()
+        # Match flag
+        match = False
 
-        # Find part number (if possible) in table
-        for row in range(0, table_rows):
-            part_number = self.screen_ui.job_library_table.item(row, 0).text()
+        try:
+            barcode_part_number = barcode_text.split('-')[0]
+            barcode_company_name = barcode_text.split('-')[1]
+        except:
+            pass
+        else:
+            # Get number of rows from table
+            table_rows = self.screen_ui.job_library_table.rowCount()
 
-            # If part number is the same, check for company
-            if part_number == barcode_part_number:
-                company_name = self.screen_ui.job_library_table.item(row, 1).text()
+            # Find part number (if possible) in table
+            for row in range(0, table_rows):
+                part_number = self.screen_ui.job_library_table.item(row, 0).text()
 
-                # if company name is the same, select row
-                if company_name == barcode_company_name:
-                    self.screen_ui.job_library_table.selectRow(row)
+                # If part number is the same, check for company
+                if part_number == barcode_part_number:
+                    company_name = self.screen_ui.job_library_table.item(row, 1).text()
+
+                    # if company name is the same, select row
+                    if company_name == barcode_company_name:
+                        self.screen_ui.job_library_table.selectRow(row)
+                        match = True
+        
+        if match:
+            self.screen_ui.barcode_edit.clear()
+        else:
+            self.screen_ui.barcode_edit.setText(f"{barcode_text} Not Found!")
+
+        # Clear focus
+        self.screen_ui.barcode_edit.clearFocus()
+        
 
     def delete_job(self):
         # Selected index is the first item in the list of selections from table
@@ -164,6 +195,78 @@ class JobLibraryScreen(QWidget):
 
         # Refresh table and clear selection
         self.prepare_screen()
+
+    def filter_table_function(self):
+        # Get filter attributes
+        part_number = self.screen_ui.part_number.text()
+        company_name = self.screen_ui.company_name.text()
+        extension_flag = self.screen_ui.extension_spring.isChecked()
+        compression_flag = self.screen_ui.compression_spring.isChecked()
+
+        if part_number != "" or company_name != "":
+            for i in range(self.screen_ui.job_library_table.rowCount()):
+                if part_number != "":
+                    if self.check_matching_part_number(i, part_number):
+                        if company_name != "":
+                            if self.check_matching_company_name(i, company_name):
+                                match = True
+                            else:
+                                match = False
+                        else:
+                            match = True
+                    else:
+                        match = False
+                else:
+                    if company_name != "":
+                        if self.check_matching_company_name(i, company_name):
+                            match = True
+                        else:
+                            match = False
+        
+                if not compression_flag:
+                    if self.check_compression_spring(i):
+                        match = False
+                if not extension_flag:
+                    if self.check_extension_spring(i):
+                        match = False
+
+                self.screen_ui.job_library_table.setRowHidden(i, not match)
+        else:
+            match = True
+            for i in range(self.screen_ui.job_library_table.rowCount()):
+                if not compression_flag:
+                    if self.check_compression_spring(i):
+                        match = False
+                if not extension_flag:
+                    if self.check_extension_spring(i):
+                        match = False
+                self.screen_ui.job_library_table.setRowHidden(i, not match)
+
+
+    def check_matching_part_number(self, row, part_number):
+        if part_number.lower() in self.screen_ui.job_library_table.item(row, 0).text().lower():
+            return True
+        else:
+            return False
+
+    def check_matching_company_name(self, row, company_name):
+        if company_name.lower() in self.screen_ui.job_library_table.item(row, 1).text().lower():
+            return True
+        else:
+            return False
+
+    def check_compression_spring(self, row):
+        if self.screen_ui.job_library_table.item(row, 4).text().lower() == "compression":
+            return True
+        else:
+            return False
+
+    def check_extension_spring(self, row):
+        if self.screen_ui.job_library_table.item(row, 4).text().lower() == "extension":
+            return True
+        else:
+            return False
+
 
 
 

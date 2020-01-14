@@ -28,8 +28,8 @@ class Ui_NewJobScreen(object):
         self.Header.setStyleSheet("QFrame {\n"
 "    background-color: rgba(93, 173, 226, 1);\n"
 "}")
-        self.Header.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.Header.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.Header.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.Header.setFrameShadow(QtWidgets.QFrame.Plain)
         self.Header.setObjectName("Header")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.Header)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -268,10 +268,6 @@ class Ui_NewJobScreen(object):
         self.spring_type.setStyleSheet("QComboBox {\n"
 "    font: 16pt \"Segoe UI\";\n"
 "    color: rgb(255, 251, 244);\n"
-"}\n"
-"QComboBox:drop-down{\n"
-"    height: 15px;\n"
-"    width: 15px;\n"
 "}\n"
 "QComboBox QAbstractItemView {\n"
 "    font: 16pt \"Segoe UI\";\n"

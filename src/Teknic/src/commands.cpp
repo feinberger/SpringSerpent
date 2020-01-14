@@ -26,12 +26,19 @@ void sendStatus(INode &zmotor, zmq::socket_t &publisher)
         if (!zmotor.Motion.MoveIsDone())
         {
             rpm = zmotor.Motion.VelMeasured.Value();
+            payload["Z Status"] = "Moving";
         }
         else
         {
             rpm = 0;
+            payload["Z Status"] = "Stopped";
         }
-        position = zmotor.Motion.PosnMeasured.Value();
+        position = (double)zmotor.Motion.PosnMeasured;
+
+        if (zmotor.Motion.Homing.IsHoming())
+        {
+            payload["Z Status"] = "Homing";
+        }
         
         // Pack json msg
         payload["Z RPM"] = std::to_string(rpm);
@@ -82,5 +89,36 @@ void determineCommand(std::string message, INode &zMotor)
         position = payload["Position"];
         std::cout << "Move Z Axis " << position.asString() << " Counts" << std::endl;
         moveMotor(zMotor, position.asInt());
+    }
+    else if (command.asString() == "Stop")
+    {
+        zMotor.Motion.NodeStop(STOP_TYPE_ABRUPT);
+    }
+    else if (command.asString() == "Feed Rate Z")
+    {
+        double feedRate = 0;
+        double feedRateSet = 0;
+
+        position = payload["Position"];
+        feedRateSet = position.asDouble();
+
+        std::cout << "Feed Rate: " << std::to_string(feedRateSet) << std::endl;
+
+        if (position.asInt() == 0)
+        {
+            feedRate = ZAXIS_FEED_MIN_RATE;
+        }
+        else if (position.asInt() >= 150)
+        {
+            feedRate = ZAXIS_FEED_MAX_RATE;
+        }
+        else
+        {
+            feedRate = ZAXIS_FEED_RATE * (feedRateSet/100.0);
+        }
+        
+        std::cout << "Setting Feed Rate to: " << std::to_string(feedRate) << std::endl;
+        zMotor.Motion.VelLimit = feedRate;
+        zMotor.Motion.VelLimit.Refresh();
     }
 }

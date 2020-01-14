@@ -50,6 +50,19 @@ INode &openMotor(SysManager &teknicManager, IPort &motorController, int motorSel
     // Clear node stops on motor
     motor.Motion.NodeStopClear();
 
+    //Set the units for Acceleration and velocity to RPM/SEC
+    motor.AccUnit(INode::RPM_PER_SEC);
+    motor.VelUnit(INode::RPM);
+
+    // Set motor acceleration limit
+    motor.Motion.AccLimit = 100000;
+
+    // Set motor velocity limit
+    motor.Motion.VelLimit = 100;
+
+    motor.Motion.PosnMeasured.AutoRefresh(true);
+    motor.Motion.VelMeasured.AutoRefresh(true);
+
     // Re-enable motor for use
     motor.EnableReq(true);
 
@@ -70,16 +83,18 @@ bool homeMotor(INode &motor)
         motor.Motion.Homing.Initiate();
 
         // Wait for homing to complete
-        while (!motor.Motion.Homing.WasHomed()) {};
+        //while (!motor.Motion.Homing.WasHomed()) {};
 
         // TODO: Add homing timeout error handling
-        return true;
+        //return true;
     }
     else 
     {
         // TODO: Add no homing validation
         return false;
     }
+
+    return true;
 }
 
 bool moveMotor(INode &motor, int32 position_count)
@@ -87,18 +102,10 @@ bool moveMotor(INode &motor, int32 position_count)
     // Clear the rising edge Move done register
     motor.Motion.MoveWentDone();
 
-    //Set the units for Acceleration and velocity to RPM/SEC
-    motor.AccUnit(INode::RPM_PER_SEC);
-    motor.VelUnit(INode::RPM);
-
-    // Set motor acceleration limit
-    motor.Motion.AccLimit = 100000;
-
-    // Set motor velocity limit
-    motor.Motion.VelLimit = 100;
-
     // Move motor
     motor.Motion.MovePosnStart(position_count);
 
-    while (!motor.Motion.MoveIsDone()) {};
+    //while (!motor.Motion.MoveIsDone()) {};
+
+    return true;
 }

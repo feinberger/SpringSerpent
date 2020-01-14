@@ -38,12 +38,14 @@ class NewJobScreen(QWidget):
 
         # Disable spring constant from typing
         self.screen_ui.spring_constant.setDisabled(True)
+        self.screen_ui.spring_length.setDisabled(True)
 
         # Screen Parameters
         self.winding_options = ['Left', 'Right']
         self.spring_types = ['Compression', 'Extension']
 
         # Spring Parameters
+        self.wire_diameter = 0.0
         self.feed_distance = 0.0
         self.feed_distance_change_rate = .1
         self.feed_distance_max = 3
@@ -61,23 +63,36 @@ class NewJobScreen(QWidget):
         # Connect buttons
         self.screen_ui.back_button.pressed.connect(self.load_home_screen)
         self.screen_ui.proceed_button.pressed.connect(self.confirm_parameters)
-        self.screen_ui.feed_distance_inc_button.pressed.connect(self.increase_feed_distance)
-        self.screen_ui.feed_distance_dec_button.pressed.connect(self.decrease_feed_distance)
-        self.screen_ui.start_dead_turns_inc_button.pressed.connect(self.increase_start_turns)
-        self.screen_ui.start_dead_turns_dec_button.pressed.connect(self.decrease_start_turns)
-        self.screen_ui.end_dead_turns_inc_button.pressed.connect(self.increase_end_turns)
-        self.screen_ui.end_dead_turns_dec_button.pressed.connect(self.decrease_end_turns)
-        self.screen_ui.live_turn_inc_button.pressed.connect(self.increase_live_turns)
-        self.screen_ui.live_turn_dec_button.pressed.connect(self.decrease_live_turns)
-        self.screen_ui.live_turn_spacing_inc_button.pressed.connect(self.increase_live_turn_spacing)
-        self.screen_ui.live_turn_spacing_dec_button.pressed.connect(self.decrease_live_turn_spacing)
+        self.screen_ui.feed_distance_inc_button.pressed.connect(
+            self.increase_feed_distance)
+        self.screen_ui.feed_distance_dec_button.pressed.connect(
+            self.decrease_feed_distance)
+        self.screen_ui.start_dead_turns_inc_button.pressed.connect(
+            self.increase_start_turns)
+        self.screen_ui.start_dead_turns_dec_button.pressed.connect(
+            self.decrease_start_turns)
+        self.screen_ui.end_dead_turns_inc_button.pressed.connect(
+            self.increase_end_turns)
+        self.screen_ui.end_dead_turns_dec_button.pressed.connect(
+            self.decrease_end_turns)
+        self.screen_ui.live_turn_inc_button.pressed.connect(
+            self.increase_live_turns)
+        self.screen_ui.live_turn_dec_button.pressed.connect(
+            self.decrease_live_turns)
+        self.screen_ui.live_turn_spacing_inc_button.pressed.connect(
+            self.increase_live_turn_spacing)
+        self.screen_ui.live_turn_spacing_dec_button.pressed.connect(
+            self.decrease_live_turn_spacing)
+
+        # Connect wire diameter change
+        self.screen_ui.wire_diameter.textChanged.connect(self.update_wire_diameter)
 
         # Connect line edits to event filter
         # self.screen_ui.part_number.installEventFilter(self)
 
     def load_home_screen(self):
         """ Emits the home screen signal """
-        self.change_screen.emit("HomeScreen", "NewJobScreen")
+        self.change_screen.emit("HomeScreen", "NewJobScreen", None, None)
 
     def prepare_screen(self, clear_flag):
         """ Prepares the new job screen for use.
@@ -87,6 +102,8 @@ class NewJobScreen(QWidget):
         """
         if clear_flag:
             # Set all Parameters to 0
+            self.spring_length = 0.0
+            self.wire_diameter = 0.0
             self.feed_distance = 0.0
             self.start_dead_turns = 0
             self.end_dead_turns = 0
@@ -107,8 +124,12 @@ class NewJobScreen(QWidget):
         self.screen_ui.feed_distance.setText(f"{self.feed_distance:.1f}")
         self.screen_ui.start_dead_turns.setText(str(self.start_dead_turns))
         self.screen_ui.live_turns.setText(str(self.live_turns))
-        self.screen_ui.live_turn_spacing.setText(f"{self.live_turn_spacing:.1f}")
+        self.screen_ui.live_turn_spacing.setText(
+            f"{self.live_turn_spacing:.1f}")
         self.screen_ui.end_dead_turns.setText(str(self.end_dead_turns))
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def increase_feed_distance(self):
         """ Updates the feed distance the GUI label """
@@ -119,6 +140,9 @@ class NewJobScreen(QWidget):
 
         # Update Feed Distance Label
         self.screen_ui.feed_distance.setText(f"{self.feed_distance:.1f}")
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def decrease_feed_distance(self):
         """ Decreases the feed distance the GUI label """
@@ -132,6 +156,9 @@ class NewJobScreen(QWidget):
         # Update Feed Distance Label
         self.screen_ui.feed_distance.setText(f"{self.feed_distance:.1f}")
 
+        # Update spring length
+        self.calculate_spring_length()
+
     def increase_start_turns(self):
         """ Increases the start turn count and updates the GUI label """
         # Increase start dead turns unless already at max
@@ -140,6 +167,9 @@ class NewJobScreen(QWidget):
 
         # Update Start Dead Turn Label
         self.screen_ui.start_dead_turns.setText(str(self.start_dead_turns))
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def decrease_start_turns(self):
         """ Decreases the start turn count and updates the GUI label """
@@ -150,6 +180,9 @@ class NewJobScreen(QWidget):
         # Update Start Dead Turn Label
         self.screen_ui.start_dead_turns.setText(str(self.start_dead_turns))
 
+        # Update spring length
+        self.calculate_spring_length()
+
     def increase_end_turns(self):
         """ Increases the end turn count and updates the GUI label """
         # Increase end dead turns unless already at max
@@ -158,6 +191,9 @@ class NewJobScreen(QWidget):
 
         # Update End Dead Turn Label
         self.screen_ui.end_dead_turns.setText(str(self.end_dead_turns))
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def decrease_end_turns(self):
         """ Decreases the end turn count and updates the GUI label """
@@ -168,6 +204,9 @@ class NewJobScreen(QWidget):
         # Update End Dead Turn Label
         self.screen_ui.end_dead_turns.setText(str(self.end_dead_turns))
 
+        # Update spring length
+        self.calculate_spring_length()
+
     def increase_live_turns(self):
         """ Increases the live count and updates the GUI label """
         # Increase live turns unless already at max
@@ -176,6 +215,9 @@ class NewJobScreen(QWidget):
 
         # Update live Turn Label
         self.screen_ui.live_turns.setText(str(self.live_turns))
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def decrease_live_turns(self):
         """ Decreases the live count and updates the GUI label """
@@ -186,6 +228,9 @@ class NewJobScreen(QWidget):
         # Update live Turn Label
         self.screen_ui.live_turns.setText(str(self.live_turns))
 
+        # Update spring length
+        self.calculate_spring_length()
+
     def increase_live_turn_spacing(self):
         """ Increases the live turn spacing and updates the GUI label """
         # Increase live turn spacing unless already at max
@@ -194,7 +239,11 @@ class NewJobScreen(QWidget):
             round(self.live_turn_spacing, 1)
 
         # Update Live Turn Spacing Label
-        self.screen_ui.live_turn_spacing.setText(f"{self.live_turn_spacing:.1f}")
+        self.screen_ui.live_turn_spacing.setText(
+            f"{self.live_turn_spacing:.1f}")
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def decrease_live_turn_spacing(self):
         """ Decreases the live turn spacing and updates the GUI label """
@@ -206,7 +255,11 @@ class NewJobScreen(QWidget):
             self.live_turn_spacing = 0.0
 
         # Update Live Turn Spacing Label
-        self.screen_ui.live_turn_spacing.setText(f"{self.live_turn_spacing:.1f}")
+        self.screen_ui.live_turn_spacing.setText(
+            f"{self.live_turn_spacing:.1f}")
+
+        # Update spring length
+        self.calculate_spring_length()
 
     def confirm_parameters(self):
         """ Confirms the input parameters for new spring and loads machine screen """
@@ -240,13 +293,27 @@ class NewJobScreen(QWidget):
 
         # TODO: determine what valid parameters are
         if parameters_valid:
-            self.change_screen.emit("MachineScreen", "NewJobScreen", job.part_number, job.company_name)
-    
+            self.change_screen.emit(
+                "MachineScreen", "NewJobScreen", job.part_number, job.company_name)
+
+    def update_wire_diameter(self):
+        try:
+            self.wire_diameter = float(self.screen_ui.wire_diameter.text().strip())
+        except:
+            self.wire_diameter = 0.0
+
+        # Update spring length
+        self.calculate_spring_length()
+
+    def calculate_spring_length(self):
+        self.spring_length = self.wire_diameter * (self.start_dead_turns + self.end_dead_turns + self.live_turns) + \
+            self.feed_distance + (self.live_turns * self.live_turn_spacing)
+        self.screen_ui.spring_length.setText(str(f"{self.spring_length:.02f}"))
+
     # def eventFilter(self, obj, event):
     #     if event.type() == QEvent.FocusIn:
     #         subprocess.call('/home/gfeinberg/Documents/Projects/Spring-Serpent/tools/keyboard.sh')
     #     if event.type() == QEvent.FocusOut:
     #         subprocess.call('/home/gfeinberg/Documents/Projects/Spring-Serpent/tools/kill_keyboard.sh')
 
-        
     #     return super(NewJobScreen, self).eventFilter(obj, event)

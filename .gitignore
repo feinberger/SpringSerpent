@@ -7,3 +7,4 @@ database/jobs.db
 src/Teknic/build/
 src/SpringSerpent/certs/
 src/SpringSerpent/aws_configuration.json
+configuration

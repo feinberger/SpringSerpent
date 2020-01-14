@@ -49,10 +49,10 @@
 }</string>
      </property>
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -464,10 +464,6 @@ QComboBox {
             <string notr="true">QComboBox {
 	font: 16pt &quot;Segoe UI&quot;;
 	color: rgb(255, 251, 244);
-}
-QComboBox:drop-down{
-	height: 15px;
-	width: 15px;
 }
 QComboBox QAbstractItemView {
 	font: 16pt &quot;Segoe UI&quot;;

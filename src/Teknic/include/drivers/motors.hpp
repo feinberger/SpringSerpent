@@ -22,6 +22,10 @@ using namespace sFnd;
 #define ZAXIS_MOTOR 		0
 #define SPINDLE_MOTOR 		1
 
+#define ZAXIS_FEED_RATE			500
+#define ZAXIS_FEED_MAX_RATE		1000
+#define ZAXIS_FEED_MIN_RATE		100
+
 /*!
  * @brief Function to open/initialize motor controller
  *

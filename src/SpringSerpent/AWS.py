@@ -59,11 +59,8 @@ class AWSHandler:
         # SpringSerpent needs to be appended to get correct path
         system_path = os.path.join(system_path, 'Spring-Serpent')
 
-        # Find src folder
-        src_path = os.path.join(system_path, 'src')
-
-        # Find SpringSerpent folder
-        config_path = os.path.join(src_path, 'SpringSerpent')
+        # Find configuration folder
+        config_path = os.path.join(system_path, 'configuration')
 
         # Path for aws_configuration.json
         configuration_file = os.path.join(config_path, 'aws_configuration.json')
